@@ -1,4 +1,5 @@
 const db = require("../data/dbConfig.js");
+const Photos = require("../photos/photos-model")
 
 module.exports = {
     addNewUser,

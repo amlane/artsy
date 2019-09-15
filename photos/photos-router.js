@@ -64,6 +64,19 @@ router.delete("/:id", (req, res) => {
         });
 });
 
+router.post("/:id/like", (req, res) => {
+    const photo_id = req.params.id;
+    const user_id = req.body.user_id;
+
+    Photos.addLike(user_id, photo_id)
+        .then(likes => {
+            res.status(200).json({ likes })
+        })
+        .catch(err => {
+            res.status(500).json(err)
+        })
+})
+
 
 // ---------------------- Custom Middleware ---------------------- //
 

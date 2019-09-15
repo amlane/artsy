@@ -6,17 +6,23 @@ module.exports = {
     findBy,
     getPhotoById,
     update,
-    remove
+    remove,
+    addLike,
+    removeLike,
+    getLikesByPhotoId
 };
 
 function getAllPhotos() {
-    return db("photos");
+    return db("photos")
 }
 
-function getPhotoById(id) {
-    return db("photos")
+async function getPhotoById(id) {
+    const photo = await db("photos")
         .where({ id })
         .first();
+
+    photo.likes = await getLikesByPhotoId(photo.id)
+    return photo;
 }
 
 function findBy(filter) {
@@ -40,3 +46,24 @@ function remove(id) {
         .where({ id })
         .del();
 }
+
+async function addLike(user_id, photo_id) {
+    await db("likes").insert({ user_id, photo_id })
+
+    return getLikesByPhotoId(photo_id)
+}
+
+function removeLike(user_id, photo_id) {
+    return db("likes")
+        .where({ user_id, photo_id })
+        .del();
+}
+
+async function getLikesByPhotoId(photo_id) {
+    const list = await db("likes").where({ photo_id })
+
+    let count = list.length;
+    return { list, count }
+}
+
+
