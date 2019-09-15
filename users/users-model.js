@@ -29,5 +29,5 @@ async function addNewUser(user) {
 }
 
 function getPhotosByUserId(id) {
-    return db("photos").where({ "photos.user_id": id });
+    return db("photos").where({ "user_id": id });
 }
