@@ -27,10 +27,10 @@ router.get("/:id", async (req, res) => {
         const id = req.params.id;
         const user = await Users.getUserById(id)
         const photos = await Users.getPhotosByUserId(id)
-        const likedPhotos = await Photos.getLikedPhotosByUserId(id)
-        const { email } = user;
+        const favorites = await Photos.getLikedPhotosByUserId(id)
+        delete user.password;
 
-        res.status(200).json({ user: { id, email }, photos, likedPhotos });
+        res.status(200).json({ user, photos, favorites });
     } catch (error) {
         res.status(500).json({ error })
     }

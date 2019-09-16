@@ -14,8 +14,8 @@ router.post("/register", (req, res) => {
     Users.addNewUser(user)
         .then(newUser => {
             const token = generateToken(newUser);
-            let { id, email, created_at } = newUser;
-            res.status(201).json({ newUser: { id, email, created_at }, token });
+            delete newUser.password;
+            res.status(201).json({ newUser, token });
         })
         .catch(error => {
             res.status(500).json(error);
@@ -31,9 +31,9 @@ router.post("/login", (req, res) => {
             if (user && bcrypt.compareSync(password, user.password)) {
                 // generate token
                 const token = generateToken(user);
-                let { id, email, created_at } = user;
+                delete user.password;
                 res.status(200).json({
-                    user: { id, email, created_at },
+                    user,
                     token //return the token upon login
                 });
             } else {
