@@ -10,7 +10,13 @@ const Photos = require("./photos-model.js");
 router.get("/", (req, res) => {
     Photos.getAllPhotos()
         .then(photos => {
-            res.status(200).json({ photos });
+            Promise.all(photos.map(async photo => {
+                const likes = await Photos.getLikesByPhotoId(photo.id);
+                photo.likes = likes
+                return photo;
+            })).then(photos => {
+                res.status(200).json({ photos })
+            })
         })
         .catch(err => {
             res.status(500).json(err);

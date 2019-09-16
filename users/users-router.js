@@ -1,6 +1,7 @@
 const router = require("express").Router();
 
 const Users = require("./users-model.js");
+const Photos = require("../photos/photos-model")
 // const restricted = require("../middleware/restricted-middleware.js");
 
 
@@ -17,36 +18,22 @@ router.get("/", (req, res) => {
         });
 });
 
-router.get("/:id", (req, res) => {
-    const id = req.params.id;
 
-    Users.getUserById(id)
-        .then(user => {
-            res.status(200).json(user);
-        })
-        .catch(err => {
-            res.status(500).json(err);
-        });
-});
+// ---------------------- GET User By Id ---------------------- //
 
-router.get("/:id/photos", (req, res) => {
-    const id = req.params.id;
+router.get("/:id", async (req, res) => {
 
-    Users.getUserById(id)
-        .then(user => {
-            console.log(user, id)
-            Users.getPhotosByUserId(id)
-                .then(photos => {
-                    let { id, email } = user;
-                    res.status(200).json({ user: { id, email }, photos });
-                })
-                .catch(err => {
-                    res.status(500).json(err);
-                });
-        })
-        .catch(err => {
-            res.status(500).json(err);
-        });
+    try {
+        const id = req.params.id;
+        const user = await Users.getUserById(id)
+        const photos = await Users.getPhotosByUserId(id)
+        const likedPhotos = await Photos.getLikedPhotosByUserId(id)
+        const { email } = user;
+
+        res.status(200).json({ user: { id, email }, photos, likedPhotos });
+    } catch (error) {
+        res.status(500).json({ error })
+    }
 });
 
 

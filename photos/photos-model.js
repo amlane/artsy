@@ -9,7 +9,8 @@ module.exports = {
     remove,
     addLike,
     removeLike,
-    getLikesByPhotoId
+    getLikesByPhotoId,
+    getLikedPhotosByUserId
 };
 
 function getAllPhotos() {
@@ -66,4 +67,15 @@ async function getLikesByPhotoId(photo_id) {
     return { list, count }
 }
 
+async function getLikedPhotosByUserId(user_id) {
+    const likes = await db("likes").where({ user_id })
+
+    return Promise.all(likes.map(async (like) => {
+        return await getPhotoById(like.photo_id)
+    })).then(likedPhotos => {
+        return likedPhotos
+    }).catch(err => {
+        console.error({ err })
+    })
+}
 

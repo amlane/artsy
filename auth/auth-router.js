@@ -61,10 +61,10 @@ function generateToken(user) {
 // ---------------------- Custom Middleware ---------------------- //
 
 // function validateUserContent(req, res, next) {
-//   if (!req.body.username || !req.body.password) {
+//   if (!req.body.email || !req.body.password) {
 //     res
 //       .status(400)
-//       .json({ message: "Username & password fields are required." });
+//       .json({ message: "Email & password fields are required." });
 //   } else {
 //     next();
 //   }
