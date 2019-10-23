@@ -10,21 +10,29 @@ module.exports = {
     addLike,
     removeLike,
     getLikesByPhotoId,
-    getLikedPhotosByUserId
+    getLikedPhotosByUserId,
+    getLikesCount
 };
 
 function getAllPhotos() {
     return db("photos")
+        .join("users", "photos.user_id", "users.id")
+        .select("photos.id", "photos.photo_url", "photos.title", "photos.description", "photos.created_at",
+            "photos.user_id", "users.username", "users.avatar_url")
 }
+
 
 async function getPhotoById(id) {
     const photo = await db("photos")
-        .where({ id })
-        .first();
-
+        .where("photos.id", id)
+        .first()
+        .join("users", "photos.user_id", "users.id")
+        .select("photos.id", "photos.photo_url", "photos.title", "photos.description", "photos.created_at",
+            "photos.user_id", "users.username", "users.avatar_url")
     photo.likes = await getLikesByPhotoId(photo.id)
     return photo;
 }
+
 
 function findBy(filter) {
     return db("photos").where(filter);
@@ -62,9 +70,11 @@ function removeLike(user_id, photo_id) {
 
 async function getLikesByPhotoId(photo_id) {
     const list = await db("likes").where({ photo_id })
+        .join("users", "likes.user_id", "users.id")
+        .select("likes.user_id", "likes.photo_id", "users.username", "users.avatar_url")
 
     let count = list.length;
-    return { list, count }
+    return { count, list }
 }
 
 async function getLikedPhotosByUserId(user_id) {
@@ -79,3 +89,6 @@ async function getLikedPhotosByUserId(user_id) {
     })
 }
 
+async function getLikesCount(photo_id) {
+    return db("likes").where("photo_id", "=", photo_id).count("photo_id as count").first();
+}
