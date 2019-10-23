@@ -10,7 +10,8 @@ module.exports = {
     addLike,
     removeLike,
     getLikesByPhotoId,
-    getLikedPhotosByUserId
+    getLikedPhotosByUserId,
+    getLikesCount
 };
 
 function getAllPhotos() {
@@ -88,3 +89,6 @@ async function getLikedPhotosByUserId(user_id) {
     })
 }
 
+async function getLikesCount(photo_id) {
+    return db("likes").where("photo_id", "=", photo_id).count("photo_id as count").first();
+}
