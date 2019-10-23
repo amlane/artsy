@@ -1,5 +1,7 @@
 # artsy API documentation
 
+BaseURL: https://artsy-be.herokuapp.com/
+
 `/api/auth/register`
 `/api/auth/login`
 
@@ -49,4 +51,9 @@ PUT
 DELETE
 `api/photos/:photoid`
 
-`api/photos/:photoid/like` ...coming soon
+`api/photos/:photoid/unlike`
+```
+{
+	"user_id": 2
+}
+```

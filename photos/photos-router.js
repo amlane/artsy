@@ -11,8 +11,8 @@ router.get("/", (req, res) => {
     Photos.getAllPhotos()
         .then(photos => {
             Promise.all(photos.map(async photo => {
-                const likes = await Photos.getLikesByPhotoId(photo.id);
-                photo.likes = likes
+                const likes = await Photos.getLikesCount(photo.id);
+                photo.likes = likes.count;
                 return photo;
             })).then(photos => {
                 res.status(200).json({ photos })
@@ -77,6 +77,19 @@ router.post("/:id/like", (req, res) => {
     Photos.addLike(user_id, photo_id)
         .then(likes => {
             res.status(200).json({ likes })
+        })
+        .catch(err => {
+            res.status(500).json(err)
+        })
+})
+
+router.delete("/:id/unlike", (req, res) => {
+    const photo_id = req.params.id;
+    const user_id = req.body.user_id;
+
+    Photos.removeLike(user_id, photo_id)
+        .then(like => {
+            res.status(200).json({ message: "I don't like this." })
         })
         .catch(err => {
             res.status(500).json(err)

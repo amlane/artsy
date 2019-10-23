@@ -26,10 +26,10 @@ router.get("/:id", async (req, res) => {
     user.favorites = await Photos.getLikedPhotosByUserId(id);
     delete user.password;
     Promise.all(user.photos.map(async photo => {
-      // const liked = await Photos.getLikesCount(photo.id);
-      const list = await Photos.getLikesByPhotoId(photo.id);
-      // photo.likes = liked.count;
-      photo.likes = list;
+      const liked = await Photos.getLikesCount(photo.id);
+      // const list = await Photos.getLikesByPhotoId(photo.id);
+      photo.likes = liked.count;
+      // photo.likes = list;
       return photo
     })).then(photos => {
       res.status(200).json({ user });
