@@ -6,7 +6,9 @@ module.exports = {
     getAllUsers,
     findBy,
     getUserById,
-    getPhotosByUserId
+    getPhotosByUserId,
+    updateUser,
+    deleteUser
 };
 
 function getAllUsers() {
@@ -27,6 +29,20 @@ async function addNewUser(user) {
     const [id] = await db("users").insert(user, "id");
 
     return getUserById(id);
+}
+
+async function updateUser(id, changes) {
+    await db("users")
+        .where({ id })
+        .update(changes)
+
+    return getUserById(id);
+}
+
+function deleteUser(id) {
+    return db("users")
+        .where({ id })
+        .del();
 }
 
 function getPhotosByUserId(id) {

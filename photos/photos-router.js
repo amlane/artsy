@@ -1,7 +1,8 @@
 const router = require("express").Router();
+const jwt_decode = require("jwt-decode");
 
 const Photos = require("./photos-model.js");
-// const restricted = require("../middleware/restricted-middleware.js");
+const restricted = require("../auth/restricted-middleware");
 
 
 // ---------------------- /api/photos ---------------------- //
@@ -23,7 +24,7 @@ router.get("/", (req, res) => {
         });
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", verifyPhotoId, (req, res) => {
     const id = req.params.id;
 
     Photos.getPhotoById(id)
@@ -35,8 +36,11 @@ router.get("/:id", (req, res) => {
         });
 });
 
-router.post("/", (req, res) => {
+router.post("/", restricted, verifyPostContent, (req, res) => {
     let photo = req.body;
+    const token = req.headers.authorization;
+    const decoded = jwt_decode(token)
+    photo.user_id = decoded.subject;
 
     Photos.addNewPhoto(photo)
         .then(newPhoto => {
@@ -44,7 +48,7 @@ router.post("/", (req, res) => {
         })
 })
 
-router.put("/:id", (req, res) => {
+router.put("/:id", restricted, verifyPhotoId, verifyPostContent, (req, res) => {
     const id = req.params.id;
     const changes = req.body;
 
@@ -58,7 +62,7 @@ router.put("/:id", (req, res) => {
 }
 );
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", restricted, verifyPhotoId, (req, res) => {
     const id = req.params.id;
 
     Photos.remove(id)
@@ -70,7 +74,7 @@ router.delete("/:id", (req, res) => {
         });
 });
 
-router.post("/:id/like", (req, res) => {
+router.post("/:id/like", restricted, (req, res) => {
     const photo_id = req.params.id;
     const user_id = req.body.user_id;
 
@@ -83,7 +87,7 @@ router.post("/:id/like", (req, res) => {
         })
 })
 
-router.delete("/:id/unlike", (req, res) => {
+router.delete("/:id/unlike", restricted, (req, res) => {
     const photo_id = req.params.id;
     const user_id = req.body.user_id;
 
@@ -99,21 +103,29 @@ router.delete("/:id/unlike", (req, res) => {
 
 // ---------------------- Custom Middleware ---------------------- //
 
-// function verifyUserId(req, res, next) {
-//   const id = req.params.id;
+function verifyPhotoId(req, res, next) {
+    const id = req.params.id;
 
-//   Users.findById(id)
-//     .then(item => {
-//       if (item) {
-//         req.item = item;
-//         next();
-//       } else {
-//         res.status(404).json({ message: "User Not Found." });
-//       }
-//     })
-//     .catch(err => {
-//       res.status(500).json(err);
-//     });
-// }
+    Photos.findById(id)
+        .then(item => {
+            if (item) {
+                req.item = item;
+                next();
+            } else {
+                res.status(404).json({ message: "Photo Not Found." });
+            }
+        })
+        .catch(err => {
+            res.status(500).json({ err });
+        });
+}
+
+function verifyPostContent(req, res, next) {
+    if (req.body.photo_url === "" || req.body.photo_url === null || req.body.title === "" || req.body.title === null) {
+        res.status(400).json({ message: "Photo url and title are required." })
+    } else {
+        next();
+    }
+}
 
 module.exports = router;

@@ -2,7 +2,7 @@ const router = require("express").Router();
 
 const Users = require("./users-model.js");
 const Photos = require("../photos/photos-model");
-// const restricted = require("../middleware/restricted-middleware.js");
+const restricted = require("../auth/restricted-middleware");
 
 // ---------------------- /api/users ---------------------- //
 
@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
 
 // ---------------------- GET User By Id ---------------------- //
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", verifyUserId, async (req, res) => {
   try {
     const id = req.params.id;
     const user = await Users.getUserById(id);
@@ -40,23 +40,47 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// ---------------- EDIT a User's Info By User Id ---------------- //
+
+router.put("/:id", restricted, verifyUserId, validateEditContent, (req, res) => {
+  const id = req.params.id;
+  const changes = req.body;
+
+  Users.updateUser(id, changes)
+    .then(updatedUser => {
+      res.status(201).json(updatedUser)
+    })
+    .catch(err => {
+      res.status(500).json({ err })
+    })
+})
+
+
 // ---------------------- Custom Middleware ---------------------- //
 
-// function verifyUserId(req, res, next) {
-//   const id = req.params.id;
+function verifyUserId(req, res, next) {
+  const id = req.params.id;
 
-//   Users.findById(id)
-//     .then(item => {
-//       if (item) {
-//         req.item = item;
-//         next();
-//       } else {
-//         res.status(404).json({ message: "User Not Found." });
-//       }
-//     })
-//     .catch(err => {
-//       res.status(500).json(err);
-//     });
-// }
+  Users.getUserById(id)
+    .then(item => {
+      if (item) {
+        req.item = item;
+        next();
+      } else {
+        res.status(404).json({ message: "User Not Found." });
+      }
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    });
+}
+
+function validateEditContent(req, res, next) {
+  if (req.body.email === "" || req.body.password === "" || req.body.email === null || req.body.password === null) {
+    res.status(400).json({ message: "Email and password fields cannot be empty." })
+  } else {
+    next();
+  }
+}
 
 module.exports = router;

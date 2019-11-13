@@ -12,7 +12,8 @@ module.exports = {
     getLikesByPhotoId,
     getLikedPhotosByUserId,
     getLikesCount,
-    getPhotoByIdSimple
+    getPhotoByIdSimple,
+    findById
 };
 
 function getAllPhotos() {
@@ -20,6 +21,12 @@ function getAllPhotos() {
         .join("users", "photos.user_id", "users.id")
         .select("photos.id", "photos.photo_url", "photos.title", "photos.description", "photos.created_at",
             "photos.user_id", "users.username", "users.avatar_url")
+}
+
+function findById(id) {
+    return db("photos")
+        .where({ id })
+        .first();
 }
 
 
