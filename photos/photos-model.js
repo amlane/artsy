@@ -76,10 +76,19 @@ function remove(id) {
         .del();
 }
 
+// async function addLike(user_id, photo_id) {
+//     await db("likes").insert({ user_id, photo_id })
+
+//     return getLikesByPhotoId(photo_id)
+// }
+
 async function addLike(user_id, photo_id) {
     await db("likes").insert({ user_id, photo_id })
 
-    return getLikesByPhotoId(photo_id)
+    return db("photos")
+        .join("users", "photos.user_id", "users.id")
+        .select("photos.id", "photos.photo_url", "photos.title", "photos.description", "photos.created_at",
+            "photos.user_id", "users.username", "users.avatar_url")
 }
 
 function removeLike(user_id, photo_id) {
