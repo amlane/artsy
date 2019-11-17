@@ -81,8 +81,8 @@ router.post("/:id/like", restricted, (req, res) => {
     const user_id = decoded.subject;
 
     Photos.addLike(user_id, photo_id)
-        .then(likes => {
-            res.status(200).json({ likes })
+        .then(results => {
+            res.status(200).json({ results })
         })
         .catch(err => {
             res.status(500).json(err)
@@ -91,11 +91,13 @@ router.post("/:id/like", restricted, (req, res) => {
 
 router.delete("/:id/unlike", restricted, (req, res) => {
     const photo_id = req.params.id;
-    const user_id = req.body.user_id;
+    const token = req.headers.authorization;
+    const decoded = jwt_decode(token)
+    const user_id = decoded.subject;
 
     Photos.removeLike(user_id, photo_id)
-        .then(like => {
-            res.status(200).json({ message: "I don't like this." })
+        .then(results => {
+            res.status(200).json({ results })
         })
         .catch(err => {
             res.status(500).json(err)
