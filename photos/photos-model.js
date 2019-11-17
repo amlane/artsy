@@ -91,10 +91,21 @@ async function addLike(user_id, photo_id) {
             "photos.user_id", "users.username", "users.avatar_url")
 }
 
-function removeLike(user_id, photo_id) {
-    return db("likes")
+// function removeLike(user_id, photo_id) {
+//     return db("likes")
+//         .where({ user_id, photo_id })
+//         .del();
+// }
+
+async function removeLike(user_id, photo_id) {
+    await db("likes")
         .where({ user_id, photo_id })
         .del();
+
+    return db("photos")
+        .join("users", "photos.user_id", "users.id")
+        .select("photos.id", "photos.photo_url", "photos.title", "photos.description", "photos.created_at",
+            "photos.user_id", "users.username", "users.avatar_url")
 }
 
 async function getLikesByPhotoId(photo_id) {
