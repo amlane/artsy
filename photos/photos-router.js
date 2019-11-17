@@ -76,7 +76,9 @@ router.delete("/:id", restricted, verifyPhotoId, (req, res) => {
 
 router.post("/:id/like", restricted, (req, res) => {
     const photo_id = req.params.id;
-    const user_id = req.body.user_id;
+    const token = req.headers.authorization;
+    const decoded = jwt_decode(token)
+    const user_id = decoded.subject;
 
     Photos.addLike(user_id, photo_id)
         .then(likes => {
