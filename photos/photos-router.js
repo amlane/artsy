@@ -82,12 +82,34 @@ router.post("/:id/like", restricted, (req, res) => {
 
     Photos.addLike(user_id, photo_id)
         .then(results => {
-            res.status(200).json({ results })
+            Promise.all(results.map(async photo => {
+                const likes = await Photos.getLikesCount(photo.id);
+                photo.likes = likes.count;
+                return photo;
+            })).then(photos => {
+                res.status(200).json({ photos })
+            })
         })
         .catch(err => {
             res.status(500).json(err)
         })
 })
+
+// router.get("/", (req, res) => {
+//     Photos.getAllPhotos()
+//         .then(photos => {
+//             Promise.all(photos.map(async photo => {
+//                 const likes = await Photos.getLikesCount(photo.id);
+//                 photo.likes = likes.count;
+//                 return photo;
+//             })).then(photos => {
+//                 res.status(200).json({ photos })
+//             })
+//         })
+//         .catch(err => {
+//             res.status(500).json(err);
+//         });
+// });
 
 router.delete("/:id/unlike", restricted, (req, res) => {
     const photo_id = req.params.id;
@@ -97,7 +119,13 @@ router.delete("/:id/unlike", restricted, (req, res) => {
 
     Photos.removeLike(user_id, photo_id)
         .then(results => {
-            res.status(200).json({ results })
+            Promise.all(results.map(async photo => {
+                const likes = await Photos.getLikesCount(photo.id);
+                photo.likes = likes.count;
+                return photo;
+            })).then(photos => {
+                res.status(200).json({ photos })
+            })
         })
         .catch(err => {
             res.status(500).json(err)
