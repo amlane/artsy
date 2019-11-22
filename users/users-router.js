@@ -25,16 +25,17 @@ router.get("/:id", verifyUserId, async (req, res) => {
     user.photos = await Users.getPhotosByUserId(id);
     user.favorites = await Photos.getLikedPhotosByUserId(id);
     delete user.password;
-    Promise.all(user.photos.map(async photo => {
-      const liked = await Photos.getLikesCount(photo.id);
-      // const list = await Photos.getLikesByPhotoId(photo.id);
-      photo.likes = liked.count;
-      // photo.likes = list;
-      return photo
-    })).then(photos => {
+    Promise.all(
+      user.photos.map(async photo => {
+        const liked = await Photos.getLikesCount(photo.id);
+        // const list = await Photos.getLikesByPhotoId(photo.id);
+        photo.likes = liked.count;
+        // photo.likes = list;
+        return photo;
+      })
+    ).then(photos => {
       res.status(200).json({ user });
-    })
-
+    });
   } catch (error) {
     res.status(500).json({ error });
   }
@@ -42,19 +43,24 @@ router.get("/:id", verifyUserId, async (req, res) => {
 
 // ---------------- EDIT a User's Info By User Id ---------------- //
 
-router.put("/:id", restricted, verifyUserId, validateEditContent, (req, res) => {
-  const id = req.params.id;
-  const changes = req.body;
+router.put(
+  "/:id",
+  restricted,
+  verifyUserId,
+  validateEditContent,
+  (req, res) => {
+    const id = req.params.id;
+    const changes = req.body;
 
-  Users.updateUser(id, changes)
-    .then(updatedUser => {
-      res.status(201).json(updatedUser)
-    })
-    .catch(err => {
-      res.status(500).json({ err })
-    })
-})
-
+    Users.updateUser(id, changes)
+      .then(updatedUser => {
+        res.status(201).json(updatedUser);
+      })
+      .catch(err => {
+        res.status(500).json({ err });
+      });
+  }
+);
 
 // ---------------------- Custom Middleware ---------------------- //
 
@@ -76,8 +82,15 @@ function verifyUserId(req, res, next) {
 }
 
 function validateEditContent(req, res, next) {
-  if (req.body.email === "" || req.body.password === "" || req.body.email === null || req.body.password === null) {
-    res.status(400).json({ message: "Email and password fields cannot be empty." })
+  if (
+    req.body.email === "" ||
+    req.body.password === "" ||
+    req.body.email === null ||
+    req.body.password === null
+  ) {
+    res
+      .status(400)
+      .json({ message: "Email and password fields cannot be empty." });
   } else {
     next();
   }

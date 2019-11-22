@@ -1,50 +1,50 @@
 const db = require("../data/dbConfig.js");
-const Photos = require("../photos/photos-model")
+const Photos = require("../photos/photos-model");
 
 module.exports = {
-    addNewUser,
-    getAllUsers,
-    findBy,
-    getUserById,
-    getPhotosByUserId,
-    updateUser,
-    deleteUser
+  addNewUser,
+  getAllUsers,
+  findBy,
+  getUserById,
+  getPhotosByUserId,
+  updateUser,
+  deleteUser
 };
 
 function getAllUsers() {
-    return db("users");
+  return db("users");
 }
 
 function getUserById(id) {
-    return db("users")
-        .where({ id })
-        .first();
+  return db("users")
+    .where({ id })
+    .first();
 }
 
 function findBy(filter) {
-    return db("users").where(filter);
+  return db("users").where(filter);
 }
 
 async function addNewUser(user) {
-    const [id] = await db("users").insert(user, "id");
+  const [id] = await db("users").insert(user, "id");
 
-    return getUserById(id);
+  return getUserById(id);
 }
 
 async function updateUser(id, changes) {
-    await db("users")
-        .where({ id })
-        .update(changes)
+  await db("users")
+    .where({ id })
+    .update(changes);
 
-    return getUserById(id);
+  return getUserById(id);
 }
 
 function deleteUser(id) {
-    return db("users")
-        .where({ id })
-        .del();
+  return db("users")
+    .where({ id })
+    .del();
 }
 
 function getPhotosByUserId(id) {
-    return db("photos").where({ "user_id": id })
+  return db("photos").where({ user_id: id });
 }
