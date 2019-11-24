@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const jwt_decode = require("jwt-decode");
 
 const Users = require("./users-model.js");
 const Photos = require("../photos/photos-model");
@@ -24,6 +25,7 @@ router.get("/:id", verifyUserId, async (req, res) => {
     const user = await Users.getUserById(id);
     user.photos = await Users.getPhotosByUserId(id);
     user.favorites = await Photos.getLikedPhotosByUserId(id);
+    user.followers = await Users.getFollowersByUserId(id);
     delete user.password;
     Promise.all(
       user.photos.map(async photo => {
@@ -48,6 +50,7 @@ router.put(
   restricted,
   verifyUserId,
   validateEditContent,
+  verifyUser,
   (req, res) => {
     const id = req.params.id;
     const changes = req.body;
@@ -61,6 +64,20 @@ router.put(
       });
   }
 );
+
+// ---------------- DELETE User ---------------- //
+
+router.delete("/:id", restricted, verifyUserId, verifyUser, (req, res) => {
+  const id = req.params.id;
+
+  Users.deleteUser(id)
+    .then(deleted => {
+      res.status(200).json({ message: `${deleted} record deleted` });
+    })
+    .catch(err => {
+      res.status(500).json({ err });
+    });
+});
 
 // ---------------------- Custom Middleware ---------------------- //
 
@@ -93,6 +110,20 @@ function validateEditContent(req, res, next) {
       .json({ message: "Email and password fields cannot be empty." });
   } else {
     next();
+  }
+}
+
+function verifyUser(req, res, next) {
+  const token = req.headers.authorization;
+  const decoded = jwt_decode(token);
+  const id = req.params.id;
+
+  if (+id === decoded.subject) {
+    next();
+  } else {
+    res.status(401).json({
+      message: "You are not authorized to perform this request on another user."
+    });
   }
 }
 

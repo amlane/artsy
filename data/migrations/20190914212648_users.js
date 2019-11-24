@@ -2,7 +2,7 @@ exports.up = function(knex) {
   return knex.schema.createTable("users", users => {
     users.increments();
 
-    users.string("username", 128).unique();
+    users.string("username", 128).notNullable();
 
     users
       .string("email", 128)
@@ -21,7 +21,7 @@ exports.up = function(knex) {
 
     users.string("location", 150);
 
-    users.string("about", 1000);
+    users.string("about", 1000).defaultTo("Share your story about your art.");
   });
 };
 
