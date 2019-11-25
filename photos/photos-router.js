@@ -69,20 +69,27 @@ router.post("/", restricted, verifyPostContent, (req, res) => {
     });
 });
 
-router.put("/:id", restricted, verifyPhotoId, verifyPostContent, (req, res) => {
-  const id = req.params.id;
-  const changes = req.body;
+router.put(
+  "/:id",
+  restricted,
+  verifyPhotoId,
+  verifyPostContent,
+  verifyUser,
+  (req, res) => {
+    const id = req.params.id;
+    const changes = req.body;
 
-  Photos.update(id, changes)
-    .then(updatedPhoto => {
-      res.status(201).json(updatedPhoto);
-    })
-    .catch(err => {
-      res.status(500).json(err);
-    });
-});
+    Photos.update(id, changes)
+      .then(updatedPhoto => {
+        res.status(201).json(updatedPhoto);
+      })
+      .catch(err => {
+        res.status(500).json(err);
+      });
+  }
+);
 
-router.delete("/:id", restricted, verifyPhotoId, (req, res) => {
+router.delete("/:id", restricted, verifyPhotoId, verifyUser, (req, res) => {
   const id = req.params.id;
 
   Photos.remove(id)
@@ -169,6 +176,21 @@ function verifyPostContent(req, res, next) {
     res.status(400).json({ message: "Photo url and title are required." });
   } else {
     next();
+  }
+}
+
+async function verifyUser(req, res, next) {
+  const id = req.params.id;
+  const token = req.headers.authorization;
+  const decoded = jwt_decode(token);
+  const photo = await Photos.getPhotoById(id);
+
+  if (+photo.user_id === decoded.subject) {
+    next();
+  } else {
+    res.status(401).json({
+      message: "You are not authorized to perform this request on another user."
+    });
   }
 }
 

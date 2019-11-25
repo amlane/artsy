@@ -104,10 +104,12 @@ async function addNewPhoto(photo) {
   return getPhotoById(id);
 }
 
-function update(id, changes) {
-  return db("photos")
+async function update(id, changes) {
+  await db("photos")
     .where({ id })
     .update(changes);
+
+  return getPhotoById(id);
 }
 
 function remove(id) {

@@ -212,6 +212,83 @@ When successful will return status code of 200 (OK) and a success message.
 
 ### Photos
 
+<!------------- Get all photos ------------->
+
+<details>
+<summary><b>GET - Get all photos</b></summary>
+
+<b>Endpoint:</b> `/photos`
+</br>No token or request body required.
+
+When successful will return status code of 200 (OK) and a the photos array.
+The user by id endpoint includes the photos details, as well as the count for likes and comments.
+
+```json
+{
+  "photos": [
+    {
+      "id": 2,
+      "photo_url": "www.phyoto.com",
+      "title": "cool yolo photo",
+      "description": "I forgot the details...",
+      "created_at": "2019-11-24 23:27:55",
+      "user_id": 8,
+      "username": "Amanda",
+      "avatar_url": "https://static.wixs...",
+      "likes": 0,
+      "comments": 0
+    },
+    {
+      "id": 5,
+      "photo_url": "www.phyoto.com",
+      "title": "this is the coolest photo everrrrr",
+      "description": "Here is an updated description?",
+      "created_at": "2019-11-24 23:52:14",
+      "user_id": 9,
+      "username": "amandalane",
+      "avatar_url": "https://static.wixs...",
+      "likes": 0,
+      "comments": 0
+    }
+  ]
+}
+```
+
+</details>
+
+<!------------- Get a photo by photo id------------->
+
+<details>
+<summary><b>GET - Get a single photo by ID</b></summary>
+
+<b>Endpoint:</b> `/photos/:id` <i>(Example: "BaseURL/photos/27")</i>
+</br>No token or request body required.
+
+When successful will return status code of 200 (OK) and the photo object.
+The photo by id endpoint includes the photo details as well as the likes (count and list of users), and array of comments.
+
+```json
+{
+  "photo": {
+    "id": 2,
+    "photo_url": "www.phyoto.com",
+    "title": "cool yolo photo",
+    "description": "I forgot the details...",
+    "created_at": "2019-11-24 23:27:55",
+    "user_id": 8,
+    "username": "Amanda",
+    "avatar_url": "https://static.wixs...",
+    "likes": {
+      "count": 0,
+      "list": []
+    },
+    "comments": []
+  }
+}
+```
+
+</details>
+
 <!------------- Add a new photo post ------------->
 
 <details>
@@ -247,6 +324,63 @@ When successful will return status code of 201 (CREATED) and the new photo objec
       "list": []
     }
   }
+}
+```
+
+</details>
+
+<!------------- Edit Photo by ID ------------->
+
+<details>
+<summary><b>PUT - Edit Photo by ID</b></summary>
+
+<b>Endpoint:</b> `/photos/:id` <i>(Example: "BaseURL/photos/2")</i>
+</br>Authorization token required in headers. Only the user is authorized to edit their own posts.
+</br>
+Requires a request body with the updated changes. Please see Data model portion of this documentation for required fields. Here is an example:
+
+```json
+{
+  "description": "Here is an updated description"
+}
+```
+
+When successful will return status code of 201 (CREATED) and the updated user object:
+
+```json
+{
+  "id": 3,
+  "photo_url": "www.phyoto.com",
+  "title": "cool yolo photo",
+  "description": "Here is an updated description",
+  "created_at": "2019-11-24 23:38:30",
+  "user_id": 9,
+  "username": "amandalane",
+  "avatar_url": "https://static.wixs...",
+  "likes": {
+    "count": 0,
+    "list": []
+  }
+}
+```
+
+</details>
+
+<!------------- Delete photo by id ------------->
+
+<details>
+<summary><b>DELETE - Delete Photo by ID</b></summary>
+
+<b>Endpoint:</b> `/photos/:id` <i>(Example: "BaseURL/photos/2")</i>
+</br>Authorization token required in headers. Only the user is authorized to delete their own posts.
+</br>
+No request body required.
+
+When successful will return status code of 200 (OK) and a success message:
+
+```json
+{
+  "message": "Photo deleted."
 }
 ```
 
