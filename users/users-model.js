@@ -1,5 +1,4 @@
 const db = require("../data/dbConfig.js");
-const Photos = require("../photos/photos-model");
 
 module.exports = {
   addNewUser,
@@ -8,7 +7,8 @@ module.exports = {
   getUserById,
   getPhotosByUserId,
   updateUser,
-  deleteUser
+  deleteUser,
+  getFollowersByUserId
 };
 
 function getAllUsers() {
@@ -47,4 +47,18 @@ function deleteUser(id) {
 
 function getPhotosByUserId(id) {
   return db("photos").where({ user_id: id });
+}
+
+function getFollowersByUserId(id) {
+  return db("followers")
+    .join("users", "followers.artist_id", "users.id")
+    .where("followers.follower_id", "=", id)
+    .select(
+      "followers.created_at",
+      "users.id",
+      "users.username",
+      "users.email",
+      "users.avatar_url",
+      "users.location"
+    );
 }
