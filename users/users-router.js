@@ -25,6 +25,7 @@ router.get("/:id", verifyUserId, async (req, res) => {
     const user = await Users.getUserById(id);
     user.photos = await Users.getPhotosByUserId(id);
     user.favorites = await Photos.getLikedPhotosByUserId(id);
+    user.following = await Users.getFollowedUsersByUserId(id);
     user.followers = await Users.getFollowersByUserId(id);
     delete user.password;
     Promise.all(

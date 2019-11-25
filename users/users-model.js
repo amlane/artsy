@@ -8,6 +8,7 @@ module.exports = {
   getPhotosByUserId,
   updateUser,
   deleteUser,
+  getFollowedUsersByUserId,
   getFollowersByUserId
 };
 
@@ -49,10 +50,24 @@ function getPhotosByUserId(id) {
   return db("photos").where({ user_id: id });
 }
 
-function getFollowersByUserId(id) {
+function getFollowedUsersByUserId(id) {
   return db("followers")
     .join("users", "followers.artist_id", "users.id")
     .where("followers.follower_id", "=", id)
+    .select(
+      "followers.created_at",
+      "users.id",
+      "users.username",
+      "users.email",
+      "users.avatar_url",
+      "users.location"
+    );
+}
+
+function getFollowersByUserId(id) {
+  return db("followers")
+    .join("users", "followers.follower_id", "users.id")
+    .where("followers.artist_id", "=", id)
     .select(
       "followers.created_at",
       "users.id",
