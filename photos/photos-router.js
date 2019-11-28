@@ -112,7 +112,9 @@ router.post("/:id/like", restricted, (req, res) => {
       Promise.all(
         results.map(async photo => {
           const likes = await Photos.getLikesCount(photo.id);
+          const comments = await Comments.getCommentsByPhotoId(photo.id);
           photo.likes = likes.count;
+          photo.comments = comments.length;
           return photo;
         })
       ).then(photos => {
@@ -135,7 +137,9 @@ router.delete("/:id/unlike", restricted, (req, res) => {
       Promise.all(
         results.map(async photo => {
           const likes = await Photos.getLikesCount(photo.id);
+          const comments = await Comments.getCommentsByPhotoId(photo.id);
           photo.likes = likes.count;
+          photo.comments = comments.length;
           return photo;
         })
       ).then(photos => {
