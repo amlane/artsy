@@ -17,7 +17,7 @@ function getCommentsByPhotoId(id) {
       "comments.id",
       "comments.content",
       "comments.created_at",
-      "users.id",
+      "users.id as user_id",
       "users.username",
       "users.avatar_url"
     );
