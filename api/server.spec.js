@@ -10,7 +10,7 @@ describe("server.js", () => {
       expect(response.status).toEqual(200);
     });
 
-    it("should return a JSON object fron the index route", async () => {
+    it("should return a JSON object from the index route", async () => {
       const response = await request(server).get("/");
       expect(response.type).toEqual("text/html");
     });
@@ -19,7 +19,6 @@ describe("server.js", () => {
   describe("the testing db", () => {
     it("should be empty", async () => {
       const res = await request(server).get("/api/users/");
-      console.log(res.body);
       expect(res.body.length).toEqual(0);
     });
   });
